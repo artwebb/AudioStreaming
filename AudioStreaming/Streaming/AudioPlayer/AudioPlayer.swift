@@ -344,10 +344,6 @@ open class AudioPlayer {
         serializationQueue.sync {
             if let item = entriesQueue.items(type: .upcoming).first(where: { $0.id.id == url.absoluteString }) {
                 entriesQueue.remove(item: item, type: .upcoming)
-
-                if playerContext.audioPlayingEntry?.id.id == item.id.id {
-                    stop(clearQueue: false)
-                }
             }
         }
         checkRenderWaitingAndNotifyIfNeeded()
