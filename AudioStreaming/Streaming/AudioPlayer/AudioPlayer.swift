@@ -1,6 +1,6 @@
 //
 //  Created by Dimitrios Chatzieleftheriou on 01/06/2020.
-//  Copyright © 2020 Decimal. All rights reserved.
+//  Copyright ┬⌐ 2020 Decimal. All rights reserved.
 //
 
 import AVFoundation
@@ -341,24 +341,11 @@ open class AudioPlayer {
     }
 
     public func removeFromQueue(url: URL) {
-        // Coordinate with source processing, which may already have promoted the
-        // upcoming successor into the buffering queue.
+        // Serialize with source promotion before removing pending entries.
         sourceQueue.sync {
             serializationQueue.sync {
                 for type: PlayerQueueType in [.upcoming, .buffering] {
-                    if let item = entriesQueue.items(type: type).first(where: {     public func removeFromQueue(url: URL) {
-        serializationQueue.sync {
-            if let item = entriesQueue.items(type: .upcoming).first(where: { $0.id.id == url.absoluteString }) {
-                entriesQueue.remove(item: item, type: .upcoming)
-            }
-        }
-        checkRenderWaitingAndNotifyIfNeeded()
-        sourceQueue.async { [weak self] in
-            self?.processSource()
-        }
-    }
-
-    /// Queues the specified URL.id.id == url.absoluteString }) {
+                    if let item = entriesQueue.items(type: type).first(where: { $0.id.id == url.absoluteString }) {
                         entriesQueue.remove(item: item, type: type)
                     }
                 }
@@ -377,7 +364,6 @@ open class AudioPlayer {
             self?.processSource()
         }
     }
-
     /// Queues the specified URL
     ///
     /// - Parameter url: A `URL` specifying the audio content to be played.
@@ -576,7 +562,7 @@ open class AudioPlayer {
             audioEngine.prepare()
             try audioEngine.start()
         } catch {
-            Logger.error("⚠️ error setting up audio engine: \(error.localizedDescription)", category: .generic)
+            Logger.error("ΓÜá∩╕Å error setting up audio engine: \(error.localizedDescription)", category: .generic)
         }
     }
 
@@ -680,7 +666,7 @@ open class AudioPlayer {
     /// - Throws: An `Error` when failed to start the engine.
     private func startEngineIfNeeded() throws {
         guard !isEngineRunning else {
-            Logger.debug("engine already running 🛵", category: .generic)
+            Logger.debug("engine already running ≡ƒ¢╡", category: .generic)
             return
         }
         try startEngine()
@@ -691,7 +677,7 @@ open class AudioPlayer {
     /// - Throws: An `Error` when failed to start the engine.
     private func startEngine() throws {
         try audioEngine.start()
-        Logger.debug("engine started 🛵", category: .generic)
+        Logger.debug("engine started ≡ƒ¢╡", category: .generic)
     }
 
     /// Pauses the audio engine and stops the player's hardware
@@ -700,7 +686,7 @@ open class AudioPlayer {
         audioEngine.reset()
         audioEngine.pause()
         player.auAudioUnit.stopHardware()
-        Logger.debug("engine paused ⏸", category: .generic)
+        Logger.debug("engine paused ΓÅ╕", category: .generic)
     }
 
     /// Stops the audio engine and the player's hardware
@@ -712,7 +698,7 @@ open class AudioPlayer {
         rendererContext.resetBuffers()
         playerContext.setInternalState(to: .stopped)
         playerContext.stopReason.write { $0 = reason }
-        Logger.debug("engine stopped 🛑", category: .generic)
+        Logger.debug("engine stopped ≡ƒ¢æ", category: .generic)
     }
 
     /// Starts the audio player, resetting the buffers if requested
