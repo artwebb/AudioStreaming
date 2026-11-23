@@ -341,9 +341,35 @@ open class AudioPlayer {
     }
 
     public func removeFromQueue(url: URL) {
+        // Coordinate with source processing, which may already have promoted the
+        // upcoming successor into the buffering queue.
+        sourceQueue.sync {
+            serializationQueue.sync {
+                for type: PlayerQueueType in [.upcoming, .buffering] {
+                    if let item = entriesQueue.items(type: type).first(where: {     public func removeFromQueue(url: URL) {
         serializationQueue.sync {
             if let item = entriesQueue.items(type: .upcoming).first(where: { $0.id.id == url.absoluteString }) {
                 entriesQueue.remove(item: item, type: .upcoming)
+            }
+        }
+        checkRenderWaitingAndNotifyIfNeeded()
+        sourceQueue.async { [weak self] in
+            self?.processSource()
+        }
+    }
+
+    /// Queues the specified URL.id.id == url.absoluteString }) {
+                        entriesQueue.remove(item: item, type: type)
+                    }
+                }
+            }
+            let reading = playerContext.entriesLock.withLock { playerContext.audioReadingEntry }
+            let playing = playerContext.entriesLock.withLock { playerContext.audioPlayingEntry }
+            if let reading = reading, reading !== playing, reading.id.id == url.absoluteString {
+                fileStreamProcessor.closeFileStreamIfNeeded()
+                reading.delegate = nil
+                reading.close()
+                playerContext.entriesLock.withLock { playerContext.audioReadingEntry = nil }
             }
         }
         checkRenderWaitingAndNotifyIfNeeded()
